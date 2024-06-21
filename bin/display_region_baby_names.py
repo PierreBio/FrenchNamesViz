@@ -23,7 +23,7 @@ fig = px.choropleth(depts,
 fig.update_geos(fitbounds="locations", visible=False)
 
 st.title("Carte Interactive de la France")
-st.write("Carte interactive des départements de France avec Plotly et Streamlit.")
+st.write("Carte interactive des départements de France.")
 
 if st.button("Afficher la carte"):
     st.plotly_chart(fig)
