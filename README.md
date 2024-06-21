@@ -2,13 +2,13 @@
 
 ![logo_france](https://github.com/PierreBio/FrenchNamesViz/assets/45881846/d6a793c5-1a36-445c-bb00-60feab42dd38)
 
-This project is carried out in the context of the Artificial Intelligence Masters of **TelecomParis**.
+This project is carried out in the context of the Artificial Intelligence Masters of **TelecomParis**. He was made by **Barthelemy Quentin**, **Billaud Pierre**, **Chenna Reda**, **Letort Yannick**.
 
 <sub>Made with __Python__</sub>
 
 ## Project
 
-Development of visualizations showing names repartition in France.
+Development of 3 visualizations showing under different angles how firstnames evolved in France from 1900 to 2020.
 
 ## How to setup?
 
@@ -53,3 +53,4 @@ streamlit run .\bin\display_region_baby_names.py
 ## Ressources
 
 - https://streamlit.io/
+- https://altair-viz.github.io/
