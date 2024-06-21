@@ -77,7 +77,7 @@ color_scale = alt.Scale(domain=[0, 100, 500, 1000, 2000, 5000],
                         range=['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#2171b5'])
 
 map_chart = alt.Chart(geojson_features).mark_geoshape().encode(
-    color=alt.Color('properties.count_name:Q', scale=color_scale, legend=alt.Legend(title="Nombre d'attributions")),
+    color=alt.Color('properties.count_name:Q', scale=color_scale, legend=alt.Legend(title=f"Attributions de {selected_name}")),
     tooltip=[
         alt.Tooltip('properties.nom:N', title='Nom du Département'),
         alt.Tooltip('properties.code:N', title='Code du Département'),
