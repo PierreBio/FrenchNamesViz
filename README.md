@@ -47,7 +47,7 @@ pip install -r requirements.txt
 - Once the project is setup, you can launch scripts to visualize:
 
 ```
-streamlit run C:\Projets\FrenchNamesViz\bin\display_region_baby_names.py
+streamlit run .\bin\display_region_baby_names.py
 ```
 
 ## Ressources
