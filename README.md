@@ -1,6 +1,6 @@
 # French Names Visualization
 
-![logo_france](https://github.com/PierreBio/FrenchNamesViz/assets/45881846/fa1d7c1a-00ea-49db-8960-d8750c052b07)
+![logo_france](https://github.com/PierreBio/FrenchNamesViz/assets/45881846/d6a793c5-1a36-445c-bb00-60feab42dd38)
 
 This project is carried out in the context of the Artificial Intelligence Masters of **TelecomParis**.
 
