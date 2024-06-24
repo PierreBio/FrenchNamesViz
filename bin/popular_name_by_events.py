@@ -6,6 +6,9 @@ from scipy.signal import find_peaks
 @st.cache_data
 def load_name_data():
     names = pd.read_csv("./data/dpt2020.csv", sep=";")
+    names['annais'] = pd.to_numeric(names['annais'], errors='coerce')
+    names = names.dropna(subset=['annais'])
+    names['annais'] = names['annais'].astype(int)
     return names
 
 def detect_recent_popularity(names, threshold=1000):
@@ -59,15 +62,17 @@ selected_popular_name = st.selectbox("Sélectionnez un prénom populaire", [name
 # Placeholder pour les informations contextuelles
 st.write(f"### Événements culturels ou médiatiques associés à {selected_popular_name}")
 
-''' Exemple d'informations contextuelles et événements historiques :
+# Exemple d'informations contextuelles et événements historiques
+
 contextual_info = {
     "Emma": {
-        "info": " ---------------------",
+        "info": "Emma est devenu très populaire en raison de l'influence de célébrités et de personnages de fiction.",
         "events": {
-            année: " ----------------------"
+            2005: "Publication du livre 'Harry Potter et la Coupe de Feu' avec le personnage d'Emma.",
+            2010: "L'actrice Emma Watson gagne en popularité avec la sortie des derniers films Harry Potter."
         }
-    },'''
-
+    },
+}
 
 if selected_popular_name in contextual_info:
     st.write(contextual_info[selected_popular_name]["info"])

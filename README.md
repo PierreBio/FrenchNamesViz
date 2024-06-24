@@ -51,11 +51,11 @@ streamlit run .\bin\gender_name.py
 ```
 
 ```
-streamlit run .\bin\popular_name_by_events.py
+streamlit run .\bin\popular_name_by_region.py
 ```
 
 ```
-streamlit run .\bin\popular_name_by_region.py
+streamlit run .\bin\popular_name_by_events.py
 ```
 
 ## Ressources
