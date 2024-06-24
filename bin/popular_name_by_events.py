@@ -5,20 +5,20 @@ from scipy.signal import find_peaks
 
 @st.cache_data
 def load_name_data():
-    names = pd.read_csv("/mnt/data/dpt2020.csv", sep=";")
+    names = pd.read_csv("./data/dpt2020.csv", sep=";")
     return names
 
 def detect_recent_popularity(names, threshold=1000):
     recent_names = names[names['annais'] >= 2000]
     name_trends = recent_names.groupby(['annais', 'preusuel'])['nombre'].sum().unstack().fillna(0)
-    
+
     popular_names = []
     for name in name_trends.columns:
         popularity = name_trends[name]
         peaks, _ = find_peaks(popularity, height=threshold)
         if len(peaks) > 0:
             popular_names.append((name, peaks, popularity.iloc[peaks].values))
-    
+
     return popular_names, name_trends
 
 names = load_name_data()
@@ -81,4 +81,3 @@ else:
 st.write("### Ressources externes")
 st.write(f"[Recherche sur {selected_popular_name} sur Wikipédia](https://fr.wikipedia.org/wiki/{selected_popular_name})")
 st.write(f"[Articles de presse sur {selected_popular_name}](https://www.google.com/search?q={selected_popular_name}+actualité)")
-

@@ -44,10 +44,18 @@ pip install -r requirements.txt
 
 ## How to launch?
 
-- Once the project is setup, you can launch scripts to visualize:
+- Once the project is setup, you can launch scripts to visualize our 3 visualizations:
 
 ```
-streamlit run .\bin\display_region_baby_names.py
+streamlit run .\bin\gender_name.py
+```
+
+```
+streamlit run .\bin\popular_name_by_events.py
+```
+
+```
+streamlit run .\bin\popular_name_by_region.py
 ```
 
 ## Ressources
