@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 ## How to launch?
 
-- Once the project is setup, you can launch scripts to visualize our 3 visualizations:
+- Once the project is setup, you can launch scripts to visualize our 3 graphics (initial and improvedd implementations):
 
 ```
 streamlit run .\bin\gender_name.py
@@ -52,10 +52,14 @@ streamlit run .\bin\gender_name.py
 
 ```
 streamlit run .\bin\popular_name_by_region.py
+
+streamlit run .\bin\popular_name_by_region_improved.py
 ```
 
 ```
 streamlit run .\bin\popular_name_by_events.py
+
+streamlit run .\bin\popular_name_by_events_improved.py
 ```
 
 ## Ressources

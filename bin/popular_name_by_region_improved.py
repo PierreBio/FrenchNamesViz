@@ -3,10 +3,34 @@ import geopandas as gpd
 import pandas as pd
 import streamlit as st
 import json
+from shapely.affinity import translate
 
 @st.cache_data
 def load_geo_data():
-    return gpd.read_file('./data/departements-version-simplifiee.geojson')
+    depts = gpd.read_file('./data/departements-avec-outre-mer.geojson')
+
+    # Déplacer les DOM-TOM sous la France Métropolitaine
+    dom_tom_translation = {
+        '971': (0, 0),  # Guadeloupe
+        '972': (-28, -30),  # Martinique
+        '973': (-26, -30),  # Guyane
+        '974': (-24, -30),  # La Réunion
+        '975': (-22, -30),  # Saint-Pierre-et-Miquelon
+        '976': (-20, -30),  # Mayotte
+        '977': (-18, -30),  # Saint-Barthélemy
+        '978': (-16, -30),  # Saint-Martin
+        '984': (-14, -30),  # Terres australes et antarctiques françaises
+        '986': (-12, -30),  # Wallis-et-Futuna
+        '987': (-10, -30),  # Polynésie française
+        '988': (-8, -30)    # Nouvelle-Calédonie
+    }
+
+    for code, translation in dom_tom_translation.items():
+        depts.loc[depts['code'] == code, 'geometry'] = depts.loc[depts['code'] == code, 'geometry'].apply(
+            lambda geom: translate(geom, xoff=translation[0], yoff=translation[1])
+        )
+
+    return depts
 
 @st.cache_data
 def load_name_data():
@@ -38,9 +62,14 @@ st.subheader("Filtres")
 col1, col2 = st.columns(2)
 
 with col1:
-    selected_year = st.selectbox('Sélectionnez une année', year_list)
+    selected_years = st.multiselect('Sélectionnez deux années', year_list, default=[year_list[0], year_list[-1]], max_selections=2)
 
-filtered_names_for_top = names[names['annais'] == selected_year]
+if len(selected_years) == 2:
+    start_year, end_year = min(selected_years), max(selected_years)
+    filtered_names_for_top = names[(names['annais'] >= start_year) & (names['annais'] <= end_year)]
+else:
+    filtered_names_for_top = names[names['annais'] == year_list[-1]]
+
 names_dict_for_top = get_top_bottom_names(filtered_names_for_top, True)
 for sex, sex_names in names_dict_for_top.items():
     sex_names['dpt'] = sex_names['dpt'].astype(str)
@@ -51,8 +80,8 @@ for sex, sex_names in names_dict_for_top.items():
         depts = depts.merge(sex_names.groupby('dpt')['preusuel'].apply(lambda x: ', '.join(x)).reset_index(),
                             left_on='code', right_on='dpt', how='left').rename(columns={'preusuel': 'top_feminins'})
 
-namesin_year = names[names['annais'] == selected_year]
-name_counts = namesin_year.groupby('preusuel')['nombre'].sum().reset_index()
+namesin_years = names[(names['annais'] >= start_year) & (names['annais'] <= end_year)] if len(selected_years) == 2 else names[names['annais'] == year_list[-1]]
+name_counts = namesin_years.groupby('preusuel')['nombre'].sum().reset_index()
 name_counts = name_counts.sort_values(by='nombre', ascending=False)
 name_counts['rank'] = name_counts['nombre'].rank(method='min', ascending=False).astype(int)
 
@@ -62,7 +91,7 @@ with col2:
     selected_name_display = st.selectbox('Sélectionnez un PRÉNOM (Attributions, #Rang)', name_list)
 selected_name = selected_name_display.split(' ')[0]
 
-filtered_names = namesin_year[namesin_year['preusuel'] == selected_name]
+filtered_names = namesin_years[namesin_years['preusuel'] == selected_name]
 name_counts__per_dept = filtered_names.groupby('dpt')['nombre'].sum().reset_index()
 
 depts['code'] = depts['code'].astype(str)
@@ -73,8 +102,9 @@ depts['count_name'] = depts['count_name'].fillna(0)
 geojson_data = json.loads(depts.to_json())
 geojson_features = alt.Data(values=geojson_data['features'])
 
-color_scale = alt.Scale(domain=[0, 100, 500, 1000, 2000, 5000],
-                        range=['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#2171b5'])
+max_count = depts['count_name'].max()
+color_scale = alt.Scale(domain=[0, max_count/5, max_count/2, max_count],
+                        range=['#f7fbff', '#c6dbef', '#6baed6', '#08306b'])
 
 map_chart = alt.Chart(geojson_features).mark_geoshape().encode(
     color=alt.Color('properties.count_name:Q', scale=color_scale, legend=alt.Legend(title=f"Attributions de {selected_name}")),
@@ -86,10 +116,12 @@ map_chart = alt.Chart(geojson_features).mark_geoshape().encode(
         alt.Tooltip('properties.top_feminins:N', title='Top 3 Féminins')
     ]
 ).project(
-    type='mercator'
+    type='mercator',
+    scale=2500,
+    center=[2, 46]
 ).properties(
     width=800,
-    height=600
+    height=1000
 ).interactive()
 
 points = pd.DataFrame({})
