@@ -68,7 +68,7 @@ if len(selected_years) == 2:
     start_year, end_year = min(selected_years), max(selected_years)
     filtered_names_for_top = names[(names['annais'] >= start_year) & (names['annais'] <= end_year)]
 else:
-    filtered_names_for_top = names[names['annais'] == year_list[-1]]
+    filtered_names_for_top = names[names['annais'] == selected_years[0]]
 
 names_dict_for_top = get_top_bottom_names(filtered_names_for_top, True)
 for sex, sex_names in names_dict_for_top.items():
@@ -80,7 +80,7 @@ for sex, sex_names in names_dict_for_top.items():
         depts = depts.merge(sex_names.groupby('dpt')['preusuel'].apply(lambda x: ', '.join(x)).reset_index(),
                             left_on='code', right_on='dpt', how='left').rename(columns={'preusuel': 'top_feminins'})
 
-namesin_years = names[(names['annais'] >= start_year) & (names['annais'] <= end_year)] if len(selected_years) == 2 else names[names['annais'] == year_list[-1]]
+namesin_years = filtered_names_for_top
 name_counts = namesin_years.groupby('preusuel')['nombre'].sum().reset_index()
 name_counts = name_counts.sort_values(by='nombre', ascending=False)
 name_counts['rank'] = name_counts['nombre'].rank(method='min', ascending=False).astype(int)
