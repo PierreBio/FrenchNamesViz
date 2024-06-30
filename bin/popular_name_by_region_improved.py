@@ -9,7 +9,6 @@ from shapely.affinity import translate
 def load_geo_data():
     depts = gpd.read_file('./data/departements-avec-outre-mer.geojson')
 
-    # Déplacer les DOM-TOM sous la France Métropolitaine
     dom_tom_translation = {
         '971': (0, 0),  # Guadeloupe
         '972': (-28, -30),  # Martinique
@@ -120,7 +119,7 @@ map_chart = alt.Chart(geojson_features).mark_geoshape().encode(
     scale=2500,
     center=[2, 46]
 ).properties(
-    width=800,
+    width=1000,
     height=1000
 ).interactive()
 
