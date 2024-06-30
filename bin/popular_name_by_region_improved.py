@@ -105,7 +105,13 @@ max_count = depts['count_name'].max()
 color_scale = alt.Scale(domain=[0, max_count/5, max_count/2, max_count],
                         range=['#f7fbff', '#c6dbef', '#6baed6', '#08306b'])
 
-map_chart = alt.Chart(geojson_features).mark_geoshape().encode(
+points = pd.DataFrame({})
+points_chart = alt.Chart(points).mark_point(color='red', size=100).encode(
+    x='x:Q',
+    y='y:Q',
+    tooltip=['label:N'])
+
+map_chart_france = alt.Chart(geojson_features).mark_geoshape().encode(
     color=alt.Color('properties.count_name:Q', scale=color_scale, legend=alt.Legend(title=f"Attributions de {selected_name}")),
     tooltip=[
         alt.Tooltip('properties.nom:N', title='Nom du Département'),
@@ -122,14 +128,26 @@ map_chart = alt.Chart(geojson_features).mark_geoshape().encode(
     width=1000,
     height=1000
 ).interactive()
+combined_chart_france = alt.layer(map_chart_france, points_chart).configure_view(stroke=None)
 
-points = pd.DataFrame({})
+map_chart_guadeloupe = alt.Chart(geojson_features).mark_geoshape().encode(
+    color=alt.Color('properties.count_name:Q', scale=color_scale, legend=alt.Legend(title=f"Attributions de {selected_name}")),
+    tooltip=[
+        alt.Tooltip('properties.nom:N', title='Nom du Département'),
+        alt.Tooltip('properties.code:N', title='Code du Département'),
+        alt.Tooltip('properties.count_name:Q', title=f"{selected_name}"),
+        alt.Tooltip('properties.top_masculins:N', title='Top 3 Masculins'),
+        alt.Tooltip('properties.top_feminins:N', title='Top 3 Féminins')
+    ]
+).project(
+    type='mercator',
+    scale=8000,
+    center=[-61, 16]
+).properties(
+    width=1000,
+    height=500
+).interactive()
+combined_chart_guadeloupe = alt.layer(map_chart_guadeloupe, points_chart).configure_view(stroke=None)
 
-points_chart = alt.Chart(points).mark_point(color='red', size=100).encode(
-    x='x:Q',
-    y='y:Q',
-    tooltip=['label:N'])
-
-combined_chart = alt.layer(map_chart, points_chart).configure_view(stroke=None)
-
-st.altair_chart(combined_chart)
+st.altair_chart(combined_chart_france)
+st.altair_chart(combined_chart_guadeloupe)
