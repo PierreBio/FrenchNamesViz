@@ -7,19 +7,18 @@ import requests
 import logging
 from datetime import datetime
 
-# Configurer le logging
 logging.basicConfig(level=logging.INFO)
 
 @st.cache_data
 def load_name_data():
-    names = pd.read_csv("./data/dpt2020.csv", sep=";")
+    names = pd.read_csv("dpt2020.csv", sep=";")
     return names
 
 def detect_recent_popularity(names, start_year, end_year, min_threshold=50, max_threshold=10000):
     names['annais'] = pd.to_numeric(names['annais'], errors='coerce')  # Convertir en numériques, remplacer les erreurs par NaN
     recent_names = names[(names['annais'] >= start_year) & (names['annais'] <= end_year)]
     name_trends = recent_names.groupby(['annais', 'preusuel'])['nombre'].sum().unstack().fillna(0)
-    
+
     popular_names = []
     for name in name_trends.columns:
         popularity = name_trends[name]
@@ -27,7 +26,7 @@ def detect_recent_popularity(names, start_year, end_year, min_threshold=50, max_
             peaks, _ = find_peaks(popularity, height=min_threshold)
             if len(peaks) > 0:
                 popular_names.append((name, peaks, popularity.iloc[peaks].values))
-            
+
     return popular_names, name_trends
 
 def get_wikidata_results(name):
@@ -38,11 +37,11 @@ def get_wikidata_results(name):
       SERVICE wikibase:label {{ bd:serviceParam wikibase:language "fr,en". }}
     }} LIMIT 90
     """
-    
+
     url = "https://query.wikidata.org/sparql"
     headers = {"User-Agent": "Mozilla/5.0"}
     response = requests.get(url, params={'query': query, 'format': 'json'}, headers=headers)
-    
+
     if response.status_code == 200:
         data = response.json()
         results = data.get("results", {}).get("bindings", [])
@@ -183,4 +182,3 @@ if wikidata_results:
         st.markdown(f"<div class='wikidata-result'>{result}</div>", unsafe_allow_html=True)
 else:
     st.write(f"Aucun résultat trouvé sur Wikidata pour {selected_name}.")
-

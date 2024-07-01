@@ -62,10 +62,10 @@ streamlit run .\bin\popular_name_by_events.py
 streamlit run .\bin\popular_name_by_events_improved.py
 ```
 
-- Pour la représentation finale :
+- Final representation (to see the 3 refined visualisations at the same time) :
 
 ```
-streamlit run .\bin\final_combined_representation.py
+streamlit run .\bin\final_combined_improved_representations.py
 ```
 
 ## Ressources
