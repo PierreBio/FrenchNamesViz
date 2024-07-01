@@ -62,6 +62,12 @@ streamlit run .\bin\popular_name_by_events.py
 streamlit run .\bin\popular_name_by_events_improved.py
 ```
 
+- Pour la représentation finale :
+
+```
+streamlit run .\bin\final_combined_representation.py
+```
+
 ## Ressources
 
 - https://streamlit.io/
