@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 @st.cache_data
 def load_name_data():
-    names = pd.read_csv("dpt2020.csv", sep=";")
+    names = pd.read_csv("./data/dpt2020.csv", sep=";")
     return names
 
 def detect_recent_popularity(names, start_year, end_year, min_threshold=50, max_threshold=10000):
