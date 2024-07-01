@@ -79,24 +79,10 @@ def get_top_bottom_names(filtered_names, top=True):
     return result
 
 
-# Set stremlit configs
 st.set_page_config(layout="wide")
 
-# Get data
 names = load_name_data()
 depts = load_geo_data()
-
-# Filtre sur les prénoms
-# name_counts = names.groupby('preusuel')['nombre'].sum().reset_index()
-# name_counts = name_counts.sort_values(by='nombre', ascending=False)
-# name_counts['rank'] = name_counts['nombre'].rank(method='min', ascending=False).astype(int)
-
-# name_list = name_counts.apply(lambda row: f"{row['preusuel']} ({row['nombre']}, #{row['rank']})", axis=1).tolist()
-
-# selected_name_display = st.selectbox('Sélectionnez un PRÉNOM (Attributions, #Rang)', name_list)
-# selected_name = selected_name_display.split(' ')[0]
-
-
 
 year_list = names['annais'].unique().tolist()
 year_list.sort()
@@ -136,7 +122,6 @@ with col2:
 
 col1, col2 = st.columns([1, 1], gap="small")
 
-# Gender Name representation
 with col1:
 
     st.subheader("Evolution du prénom dans le temps")
@@ -144,28 +129,21 @@ with col1:
     name_evolution_chart = get_name_evolution_chart(names, selected_name)
     st.altair_chart(name_evolution_chart)
 
-# Popular Name by Region representation 
 with col2:
 
     
     st.subheader("Carte Interactive des prénoms par région")
 
-    # Filtrer les données pour les années sélectionnées
     filtered_names_for_all = names[(names['annais'] >= start_year) & (names['annais'] <= end_year)]
     
-    # Calculer le nombre total de prénoms attribués par département pour toutes les années sélectionnées
     total_names_per_dept = filtered_names_for_all.groupby('dpt')['nombre'].sum().reset_index().rename(columns={'nombre': 'total_count'})
 
-    # Calculer le nombre de fois où le prénom sélectionné a été attribué par département pour les années sélectionnées
     name_counts_per_dept = filtered_names_for_all[filtered_names_for_all['preusuel'] == selected_name].groupby('dpt')['nombre'].sum().reset_index()
 
-    # Fusionner les deux DataFrames
     name_counts_per_dept = name_counts_per_dept.merge(total_names_per_dept, on='dpt', how='right')
     
-    # Remplir les valeurs manquantes par 0
     name_counts_per_dept['nombre'] = name_counts_per_dept['nombre'].fillna(0)
     
-    # Calculer la proportion
     name_counts_per_dept['proportion'] = name_counts_per_dept['nombre'] / name_counts_per_dept['total_count']
     
     depts['code'] = depts['code'].astype(str)
@@ -263,14 +241,12 @@ names = load_name_data()
 st.title("Analyse des Prénoms Populaires en France")
 st.subheader("Prénoms qui sont devenus soudainement populaires")
 
-# Sélecteur d'années et intervalle de seuil
 start_year, end_year = st.select_slider(
     'Sélectionnez un créneau d\'années pour l\'analyse',
     options=list(range(1900, 2021)),
     value=(1990, 2020)
 )
 
-# Sélecteurs pour le seuil de popularité en utilisant un seul curseur avec plage
 min_threshold, max_threshold = st.select_slider(
     'Sélectionnez l\'intervalle de seuil de popularité pour détecter les pics',
     options=list(range(500, 10001,500)),
@@ -283,12 +259,10 @@ popular_names, name_trends = detect_recent_popularity(names, start_year, end_yea
 
 st.write(f"**Nombre de prénoms détectés comme récemment populaires entre {start_year} et {end_year}. En voici la liste: {len(popular_names)}**")
 
-# Afficher la liste des prénoms détectés
 st.markdown("### Prénoms détectés comme récemment populaires")
 for name, peaks, values in popular_names:
     st.markdown(f"{name} - Pics en {', '.join([str(name_trends.index[p]) for p in peaks])} avec des valeurs {', '.join(map(str, values))}")
 
-# Premier graphique pour les tendances globales
 st.subheader("Graphique des tendances globales des prénoms populaires")
 
 fig_global = go.Figure()
@@ -296,7 +270,6 @@ fig_global = go.Figure()
 for name, peaks, _ in popular_names:
     fig_global.add_trace(go.Scatter(x=name_trends.index, y=name_trends[name], mode='lines', name=name))
 
-# Ajouter les titres et les légendes
 fig_global.update_layout(
     title=f"Tendances globales des prénoms populaires en France ({start_year}-{end_year})",
     xaxis_title="Années",
@@ -307,7 +280,6 @@ fig_global.update_layout(
 
 st.plotly_chart(fig_global)
 
-# Deuxième graphique pour les tendances spécifiques
 st.subheader("Graphique des tendances spécifiques d'un prénom populaire")
 
 selected_name = st.selectbox("Sélectionnez un prénom populaire", [name for name, _, _ in popular_names])
@@ -332,7 +304,6 @@ for name, peaks, _ in popular_names:
             ))
             st.write(f"Pics pour {name}: {[name_trends.index[p] for p in valid_peaks]}")
 
-# Ajouter les titres et les légendes
 fig_specific.update_layout(
     title=f"Tendances spécifiques du prénom {selected_name} en France ({start_year}-{end_year})",
     xaxis_title="Années",
@@ -355,19 +326,15 @@ if valid_peaks:
     else:
         st.write(f"Aucun événement trouvé pour l'année {selected_peak}")
 
-# Affichage des événements culturels ou médiatiques associés
 st.write(f"### Événements culturels ou médiatiques associés à {selected_name}")
 
-# Liens vers des ressources externes
 st.write(f"### Recherche sur {selected_name} sur Wikipédia")
 st.write(f"***[Recherche sur {selected_name} sur Wikipédia](https://fr.wikipedia.org/wiki/{selected_name})***")
 st.write(f"### Articles de presse sur {selected_name}")
 st.write(f"***[Articles de presse sur {selected_name}](https://www.google.com/search?q={selected_name}+actualité)***")
 
-# Résultats de Wikidata pour le prénom sélectionné
 st.subheader(f"15 premiers Résultats sur Wikidata pour {selected_name}")
 
-# Afficher les résultats de Wikidata pour le prénom sélectionné
 wikidata_results = get_wikidata_results(selected_name)
 if wikidata_results:
     for result in wikidata_results[:15]:
